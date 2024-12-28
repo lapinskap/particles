@@ -1,0 +1,28 @@
+cbuffer LightBuffer
+{
+    float4 diffuseColor;
+    float3 lightDirection;
+};
+
+struct PixelInput
+{
+    float4 color: COLOR;
+    float4 position: SV_POSITION;
+	float4 normal: NORMAL;
+};
+
+
+float4 LightPixelShader(PixelInput input) : SV_TARGET
+{
+	// Invert the light direction for calculations.
+    float3 lightDir = -lightDirection;
+
+    // Calculate the amount of light on this pixel.
+    float lightIntensity = abs(dot(input.normal.xyz, lightDir));
+
+    float4 color = input.color;
+    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
+    color = color * saturate(diffuseColor * lightIntensity);
+
+	return input.color;
+}
