@@ -21,13 +21,15 @@ public:
 protected:
 	struct Vertex
 	{
-		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT4 position;
+		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT4 normal;
 	};
 
 	virtual std::vector<Vertex> CreateVertices() const;
 	virtual std::vector<uint> CreateIndices() const;
+	int _vertexCount = 0;
+	int _indexCount = 0;
 
 
 private:
@@ -37,7 +39,5 @@ private:
 
 	ReleasePtr<ID3D11Buffer> _vertexBuffer;
 	ReleasePtr<ID3D11Buffer> _indexBuffer;
-	int _vertexCount = 0;
-	int _indexCount = 0;
 	std::unique_ptr<Texture> _texture;
 };

@@ -8,6 +8,7 @@
 *.user
 
 .vs/
+x64/
 
 *.recipe
 *.ilk

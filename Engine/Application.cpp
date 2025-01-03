@@ -59,6 +59,6 @@ bool Application::Frame()
 		rotation += 360.0f;
 	}
 
-	return Render(0);
+	return Render(rotation);
 }
 

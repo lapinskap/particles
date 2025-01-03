@@ -21,10 +21,11 @@ int Model::GetIndexCount()
 }
 
 std::vector<Model::Vertex> Model::CreateVertices() const
-{
+{	
+	// Load the vertex array with data.
 	std::vector<Vertex> vertices(4);
 
-	// Load the vertex array with data.
+	//// Load the vertex array with data.
 	vertices[0].position = DirectX::XMFLOAT4(-1.0f, -1.0f, 0.0f, 1.0f);  // Bottom left
 	vertices[0].color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	vertices[0].normal = DirectX::XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f);
@@ -40,9 +41,6 @@ std::vector<Model::Vertex> Model::CreateVertices() const
 	vertices[3].position = DirectX::XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f); // Top right
 	vertices[3].color = DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 	vertices[3].normal = DirectX::XMFLOAT4(0.0f, 0.0f, -1.0f, 0.0f);
-
-	std::cout << "Model CreateVertices" << std::endl;
-
 
 	return vertices;
 }
@@ -81,6 +79,8 @@ void Model::InitializeBuffers(D3D& d3D)
 
 	// Now create the vertex buffer.
 	result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &_vertexBuffer);
+	std::cout << "InitializeBuffers vertices count: " << vertices.size() << std::endl;
+
 	if (FAILED(result))
 		throw D3DError("Failed to create a vertex buffer");
 
@@ -105,7 +105,7 @@ void Model::InitializeBuffers(D3D& d3D)
 		throw D3DError("Failed to create an index buffer");
 
 	_indexCount = indices.size();
-	std::cout << "Model index count: " << _indexCount << std::endl;
+	std::cout << "InitializeBuffers index count: " << _indexCount << std::endl;
 }
 
 void Model::RenderBuffers(D3D& d3D)

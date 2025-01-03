@@ -4,7 +4,7 @@
 #include "D3D.h"
 
 #include "Camera.h"
-//#include "Model.h"
+#include "Model.h"
 #include "SphereModel.h"
 #include "LightShader.h"
 #include "Light.h"

@@ -87,7 +87,7 @@ bool LightShader::InitializeShader(D3D& d3D)
 	// This setup needs to match the Vertex stucture in the Model and in the shader.
 	D3D11_INPUT_ELEMENT_DESC vertexLayout[3];
 
-	vertexLayout[0].SemanticName = "COLOR";
+	vertexLayout[0].SemanticName = "POSITION";
 	vertexLayout[0].SemanticIndex = 0;
 	vertexLayout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	vertexLayout[0].InputSlot = 0;
@@ -95,7 +95,7 @@ bool LightShader::InitializeShader(D3D& d3D)
 	vertexLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	vertexLayout[0].InstanceDataStepRate = 0;
 
-	vertexLayout[1].SemanticName = "POSITION";
+	vertexLayout[1].SemanticName = "COLOR";
 	vertexLayout[1].SemanticIndex = 0;
 	vertexLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	vertexLayout[1].InputSlot = 0;
