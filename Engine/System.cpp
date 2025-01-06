@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "System.h"
+#include <iostream>
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
@@ -7,10 +8,15 @@ System* ApplicationHandle = nullptr;
 
 System::System()
 {
-	if (AllocConsole())
+	if (AttachConsole(ATTACH_PARENT_PROCESS))
 	{
 		freopen("CONOUT$", "w", stdout);
 	}
+	else if (AllocConsole())
+	{
+		freopen("CONOUT$", "w", stdout);
+	}
+	
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	uint screenWidth = 0;
@@ -113,7 +119,7 @@ void System::InitializeWindows(uint& screenWidth, uint& screenHeight)
 	_hinstance = GetModuleHandle(nullptr);
 
 	// Give the application a name.
-	_applicationName = L"Engine";
+	_applicationName = "Molecule";
 
 	// Setup the windows class with default settings.
 	WNDCLASSEX wc;

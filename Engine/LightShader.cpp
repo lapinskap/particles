@@ -19,6 +19,12 @@ struct LightBuffer
 	float padding;
 };
 
+struct TimeBuffer
+{
+	float time;
+	float padding[3];
+};
+
 LightShader::LightShader(D3D& d3D)
 {
 	InitializeShader(d3D);
@@ -26,10 +32,10 @@ LightShader::LightShader(D3D& d3D)
 
 bool LightShader::Render(D3D& d3D, int indexCount, 
 						DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
-						Light& light)
+						Light& light, float time)
 {
 	// Set the shader parameters that it will use for rendering.
-	bool result = SetShaderParameters(d3D, worldMatrix, viewMatrix, projectionMatrix, light);
+	bool result = SetShaderParameters(d3D, worldMatrix, viewMatrix, projectionMatrix, light, time);
 	if (!result)
 		return false;
 
@@ -149,16 +155,29 @@ bool LightShader::InitializeShader(D3D& d3D)
 	result = device->CreateBuffer(&lightBufferDesc, nullptr, &_lightBuffer);
 	if (FAILED(result))
 		throw D3DError("Failed to create a light buffer");
+
+	D3D11_BUFFER_DESC timeBufferDesc;
+	ZeroMemory(&timeBufferDesc, sizeof(timeBufferDesc));
+	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	timeBufferDesc.ByteWidth = sizeof(TimeBuffer);
+	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	timeBufferDesc.MiscFlags = 0;
+	timeBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&timeBufferDesc, nullptr, &_timeBuffer);
+	if (FAILED(result))
+		throw D3DError("Failed to create a time buffer");
+
+	return true;
 }
 
 bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
-												Light& light)
+												Light& light, float time)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	unsigned int bufferNumber;
-	MatrixBuffer* dataPtr;
-	LightBuffer* dataPtr2;
 
 	// Transpose the matrices to prepare them for the shader.
 	worldMatrix = XMMatrixTranspose(worldMatrix);
@@ -172,43 +191,59 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 	if (FAILED(result))
 		return false;
 
-	// Get a pointer to the data in the constant buffer.
-	dataPtr = (MatrixBuffer*)mappedResource.pData;
+	{
+		// Get a pointer to the data in the constant buffer.
+		MatrixBuffer* dataPtr = (MatrixBuffer*)mappedResource.pData;
 
-	// Copy the matrices into the constant buffer.
-	dataPtr->world = worldMatrix;
-	dataPtr->view = viewMatrix;
-	dataPtr->projection = projectionMatrix;
+		// Copy the matrices into the constant buffer.
+		dataPtr->world = worldMatrix;
+		dataPtr->view = viewMatrix;
+		dataPtr->projection = projectionMatrix;
+	}
 
 	// Unlock the constant buffer.
 	deviceContext->Unmap(_matrixBuffer.get(), 0);
 
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
 	// Now set the constant buffer in the vertex shader with the updated values.
-	deviceContext->VSSetConstantBuffers(bufferNumber, 1, &_matrixBuffer);
+	deviceContext->VSSetConstantBuffers(0, 1, &_matrixBuffer);
 
 	// Lock the light constant buffer so it can be written to.
 	result = deviceContext->Map(_lightBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	if (FAILED(result))
 		return false;
 
-	// Get a pointer to the data in the constant buffer.
-	dataPtr2 = (LightBuffer*)mappedResource.pData;
+	{
+		// Get a pointer to the data in the constant buffer.
+		LightBuffer* dataPtr = (LightBuffer*)mappedResource.pData;
 
-	// Copy the lighting variables into the constant buffer.
-	dataPtr2->diffuseColor = light.diffuseColor;
-	dataPtr2->lightDirection = light.direction;
+		// Copy the lighting variables into the constant buffer.
+		dataPtr->diffuseColor = light.diffuseColor;
+		dataPtr->lightDirection = light.direction;
+	}
 
 	// Unlock the constant buffer.
 	deviceContext->Unmap(_lightBuffer.get(), 0);
 
-	// Set the position of the light constant buffer in the pixel shader.
-	bufferNumber = 0;
+	// Finally set the light constant buffer in the pixel shader with the updated values.
+	deviceContext->PSSetConstantBuffers(0, 1, &_lightBuffer);
+
+	result = deviceContext->Map(_timeBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	{
+		// Get a pointer to the data in the constant buffer.
+		TimeBuffer* dataPtr = (TimeBuffer*)mappedResource.pData;
+
+		// Copy the lighting variables into the constant buffer.
+		dataPtr->time = time;
+	}
+
+	// Unlock the constant buffer.
+	deviceContext->Unmap(_timeBuffer.get(), 0);
 
 	// Finally set the light constant buffer in the pixel shader with the updated values.
-	deviceContext->PSSetConstantBuffers(bufferNumber, 1, &_lightBuffer);
+	deviceContext->PSSetConstantBuffers(1, 1, &_timeBuffer);
 
 	return true;
 }

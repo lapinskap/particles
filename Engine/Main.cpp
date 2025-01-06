@@ -1,4 +1,5 @@
 #include "System.h"
+#include <iostream>
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline, int iCmdshow)
 {
@@ -12,6 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR pScmdline,
 	}
 	catch (const std::exception& e)
 	{
+		std::cout << e.what() << std::endl;
 		MessageBoxA(nullptr, e.what(), "Error", MB_OK);
 		return 1;
 	}

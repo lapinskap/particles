@@ -14,14 +14,14 @@ public:
 
 	bool Render(D3D& d3D, int indexCount,
 		DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-		Light& light);
+		Light& light, float time);
 
 private:
 
 	bool InitializeShader(D3D& d3D);
 
 	bool SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-										Light& light);
+										Light& light, float time);
 	void RenderShader(D3D& d3D, int indexCount);
 
 	ReleasePtr<ID3D11VertexShader> _vertexShader;
@@ -30,4 +30,5 @@ private:
 	ReleasePtr<ID3D11SamplerState> _sampleState;
 	ReleasePtr<ID3D11Buffer> _matrixBuffer;
 	ReleasePtr<ID3D11Buffer> _lightBuffer;
+	ReleasePtr<ID3D11Buffer> _timeBuffer;
 };

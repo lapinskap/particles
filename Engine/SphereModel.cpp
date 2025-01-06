@@ -2,19 +2,22 @@
 #include <iostream>
 #include <cmath>
 
-const int NUM_SEGMENTS = 20;
+const int NUM_SEGMENTS = 10;
 
 std::vector<Model::Vertex> SphereModel::CreateVertices() const
 {
 	std::vector<Vertex> vertices;
-	// (polar angle) latitude in degrees
+
+	// (polar angle) latitude
 	for (int i = 0; i < NUM_SEGMENTS; i++)
 	{
-		//  (azimuthal angle) longitude in degrees
+		//  (azimuthal angle) longitude
 		for (int j = 0; j < NUM_SEGMENTS; j++)
 		{
+
 			float azimuthalAngle = DirectX::XM_2PI * j / NUM_SEGMENTS;
 			float polarAngle = -DirectX::XM_PIDIV2 + DirectX::XM_PI * ((float)i / NUM_SEGMENTS);
+			polarAngle += DirectX::XM_PI * 0.5f / NUM_SEGMENTS;
 
 			float x = cos(azimuthalAngle) * cos(polarAngle);
 
@@ -30,6 +33,26 @@ std::vector<Model::Vertex> SphereModel::CreateVertices() const
 
 			vertices.push_back({ position, color, normal });
 		}
+	}
+
+	// Add the poles
+
+	// South pole
+	{
+		DirectX::XMFLOAT4 position = { 0.0f, -1.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT4 color = { 0.2f, 0.5f, 0.2f, 0.0f };
+		DirectX::XMFLOAT4 normal = { 0.0f, -1.0f, 0.0f, 0.0f };
+
+		vertices.push_back({ position, color, normal });
+	}
+
+	// North pole
+	{
+		DirectX::XMFLOAT4 position = { 0.0f, 1.0f, 0.0f, 1.0f };
+		DirectX::XMFLOAT4 color = { 0.2f, 0.5f, 0.2f, 0.0f };
+		DirectX::XMFLOAT4 normal = { 0.0f, 1.0f, 0.0f, 0.0f };
+
+		vertices.push_back({ position, color, normal });
 	}
 
 	std::cout << "SphereModel CreateVertices, size: " << vertices.size() << std::endl;
@@ -57,64 +80,26 @@ std::vector<uint> SphereModel::CreateIndices() const
 		}
 	}
 
+	constexpr int southPoleIndex = NUM_SEGMENTS * NUM_SEGMENTS;
+	constexpr int northPoleIndex = southPoleIndex + 1;
+
+	// Poles
+	// South pole - Wroclaw
+	for (int i = 0; i < NUM_SEGMENTS; i++)
+	{
+		indices.push_back(i);
+		indices.push_back((i + 1) % NUM_SEGMENTS);
+		indices.push_back(southPoleIndex);
+	}
+	// North pole - Gdansk
+	for (int i = 0; i < NUM_SEGMENTS; i++)
+	{
+		indices.push_back((NUM_SEGMENTS - 1) * NUM_SEGMENTS + i);
+		indices.push_back((NUM_SEGMENTS - 1) * NUM_SEGMENTS + (i + 1) % NUM_SEGMENTS);
+		indices.push_back(northPoleIndex);
+	}
+
 	std::cout << "SphereModel index count: " << indices.size() << std::endl;
 
 	return indices;
 }
-
-//std::vector<Model::Vertex> SphereModel::CreateVertices() const
-//{
-//    std::vector<Vertex> vertices;
-//
-//    for (int i = 0; i <= NUM_SEGMENTS; ++i)
-//    {
-//        float theta = i * DirectX::XM_PI / NUM_SEGMENTS; // polar angle
-//
-//        for (int j = 0; j <= NUM_SEGMENTS; ++j)
-//        {
-//            float phi = j * 2 * DirectX::XM_PI / NUM_SEGMENTS; // azimuthal angle
-//
-//            float x = sin(theta) * cos(phi);
-//            float y = cos(theta);
-//            float z = sin(theta) * sin(phi);
-//
-//           std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
-//
-//            DirectX::XMFLOAT4 position = { x, y, z, 1.0f };
-//            DirectX::XMFLOAT4 color = { 1.0f, 0.0f, 0.0f, 1.0f };
-//            DirectX::XMFLOAT4 normal = { x, y, z, 0.0f };
-//
-//            vertices.push_back({ position, color, normal });
-//        }
-//    }
-//
-//    std::cout << "SphereModel CreateVertices, size: " << vertices.size() << std::endl;
-//
-//    return vertices;
-//}
-//
-//std::vector<uint> SphereModel::CreateIndices() const
-//{
-//    std::vector<uint> indices;
-//
-//    for (int i = 0; i < NUM_SEGMENTS; ++i)
-//    {
-//        for (int j = 0; j < NUM_SEGMENTS; ++j)
-//        {
-//            int first = i * (NUM_SEGMENTS + 1) + j;
-//            int second = first + NUM_SEGMENTS + 1;
-//
-//            indices.push_back(first);
-//            indices.push_back(second);
-//            indices.push_back(first + 1);
-//
-//            indices.push_back(second);
-//            indices.push_back(second + 1);
-//            indices.push_back(first + 1);
-//        }
-//    }
-//
-//    std::cout << "SphereModel index count: " << indices.size() << std::endl;
-//
-//    return indices;
-//};

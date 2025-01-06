@@ -24,7 +24,7 @@ public:
 
 private:
 
-	LPCWSTR _applicationName = nullptr;
+	LPCSTR _applicationName = nullptr;
 	HINSTANCE _hinstance = nullptr;
 	HWND _hwnd = nullptr;
 
