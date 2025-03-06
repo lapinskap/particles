@@ -7,9 +7,15 @@ const WCHAR* psFilename = L"../Engine/Light.ps";
 
 struct MatrixBuffer
 {
-	DirectX::XMMATRIX world;
+	DirectX::XMMATRIX world[2];
 	DirectX::XMMATRIX view;
 	DirectX::XMMATRIX projection;
+};
+
+struct ViewBuffer
+{
+	DirectX::XMFLOAT3 viewPosition;
+	float padding;
 };
 
 struct LightBuffer
@@ -26,11 +32,12 @@ struct TimeBuffer
 };
 
 LightShader::LightShader(D3D& d3D)
+	: Shader(d3D, vsFilename, psFilename)
 {
 	InitializeShader(d3D);
 }
 
-bool LightShader::Render(D3D& d3D, int indexCount, 
+bool LightShader::Render_Old(D3D& d3D, int indexCount,
 						DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
 						Light& light, float time)
 {
@@ -43,6 +50,20 @@ bool LightShader::Render(D3D& d3D, int indexCount,
 	RenderShader(d3D, indexCount);
 
 	return true;
+}
+
+D3D11_INPUT_ELEMENT_DESC LightShader::renderVertexLayout(const char* semanticName, uint semanticIndex, DXGI_FORMAT format, uint alignedByteOffset)
+{
+	D3D11_INPUT_ELEMENT_DESC vertexLayout;
+	vertexLayout.SemanticName = semanticName;
+	vertexLayout.SemanticIndex = semanticIndex;
+	vertexLayout.Format = format;
+	vertexLayout.InputSlot = 0;
+	vertexLayout.AlignedByteOffset = alignedByteOffset;
+	vertexLayout.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	vertexLayout.InstanceDataStepRate = 0;
+
+	return vertexLayout;
 }
 
 
@@ -91,31 +112,15 @@ bool LightShader::InitializeShader(D3D& d3D)
 
 	// Create the vertex input layout description.
 	// This setup needs to match the Vertex stucture in the Model and in the shader.
-	D3D11_INPUT_ELEMENT_DESC vertexLayout[3];
+	D3D11_INPUT_ELEMENT_DESC vertexLayout[4];
 
-	vertexLayout[0].SemanticName = "POSITION";
-	vertexLayout[0].SemanticIndex = 0;
-	vertexLayout[0].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	vertexLayout[0].InputSlot = 0;
-	vertexLayout[0].AlignedByteOffset = 0;
-	vertexLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexLayout[0].InstanceDataStepRate = 0;
+	vertexLayout[0] = renderVertexLayout("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
 
-	vertexLayout[1].SemanticName = "COLOR";
-	vertexLayout[1].SemanticIndex = 0;
-	vertexLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	vertexLayout[1].InputSlot = 0;
-	vertexLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexLayout[1].InstanceDataStepRate = 0;
+	vertexLayout[1] = renderVertexLayout("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_APPEND_ALIGNED_ELEMENT);
 
-	vertexLayout[2].SemanticName = "NORMAL";
-	vertexLayout[2].SemanticIndex = 0;
-	vertexLayout[2].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-	vertexLayout[2].InputSlot = 0;
-	vertexLayout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-	vertexLayout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-	vertexLayout[2].InstanceDataStepRate = 0;
+	vertexLayout[2] = renderVertexLayout("NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_APPEND_ALIGNED_ELEMENT);
+
+	vertexLayout[3] = renderVertexLayout("SV_InstanceID", 0, DXGI_FORMAT_R32_UINT, D3D11_APPEND_ALIGNED_ELEMENT);
 
 	// Get a count of the elements in the layout.
 	uint numElements = sizeof(vertexLayout) / sizeof(vertexLayout[0]);
@@ -139,6 +144,20 @@ bool LightShader::InitializeShader(D3D& d3D)
 	result = device->CreateBuffer(&matrixBufferDesc, nullptr, &_matrixBuffer);
 	if (FAILED(result))
 		throw D3DError("Failed to create a matrix buffer");
+
+	D3D11_BUFFER_DESC viewBufferDesc;
+	ZeroMemory(&viewBufferDesc, sizeof(viewBufferDesc));
+	viewBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	viewBufferDesc.ByteWidth = sizeof(ViewBuffer);
+	viewBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	viewBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	viewBufferDesc.MiscFlags = 0;
+	viewBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	result = device->CreateBuffer(&viewBufferDesc, nullptr, &_viewBuffer);
+	if (FAILED(result))
+		throw D3DError("Failed to create a view buffer");
 
 	// Setup the description of the light dynamic constant buffer that is in the pixel shader.
 	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
@@ -180,7 +199,8 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
 	// Transpose the matrices to prepare them for the shader.
-	worldMatrix = XMMatrixTranspose(worldMatrix);
+	DirectX::XMMATRIX worldMatrix0 = XMMatrixTranspose(worldMatrix);
+	DirectX::XMMATRIX worldMatrix1 = XMMatrixTranspose(worldMatrix * DirectX::XMMatrixTranslation(2.0f, 0.0f, 0.0f));
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
@@ -196,7 +216,8 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 		MatrixBuffer* dataPtr = (MatrixBuffer*)mappedResource.pData;
 
 		// Copy the matrices into the constant buffer.
-		dataPtr->world = worldMatrix;
+		dataPtr->world[0] = worldMatrix0;
+		dataPtr->world[1] = worldMatrix1;
 		dataPtr->view = viewMatrix;
 		dataPtr->projection = projectionMatrix;
 	}
@@ -205,7 +226,23 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 	deviceContext->Unmap(_matrixBuffer.get(), 0);
 
 	// Now set the constant buffer in the vertex shader with the updated values.
+	// 0 - buffer index? 1 - count?
 	deviceContext->VSSetConstantBuffers(0, 1, &_matrixBuffer);
+
+	result = deviceContext->Map(_viewBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		return false;
+
+	{
+		ViewBuffer* dataPtr = reinterpret_cast<ViewBuffer*>(mappedResource.pData);
+		dataPtr->viewPosition = DX::XMFLOAT3(0, 0, 0);
+	}
+
+	// Unlock the constant buffer.
+	deviceContext->Unmap(_viewBuffer.get(), 0);
+
+	// Finally set the light constant buffer in the pixel shader with the updated values.
+	deviceContext->VSSetConstantBuffers(1, 1, &_viewBuffer);
 
 	// Lock the light constant buffer so it can be written to.
 	result = deviceContext->Map(_lightBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
@@ -239,6 +276,7 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 		dataPtr->time = time;
 	}
 
+
 	// Unlock the constant buffer.
 	deviceContext->Unmap(_timeBuffer.get(), 0);
 
@@ -259,9 +297,11 @@ void LightShader::RenderShader(D3D& d3D, int indexCount)
 	deviceContext->VSSetShader(_vertexShader.get(), nullptr, 0);
 	deviceContext->PSSetShader(_pixelShader.get(), nullptr, 0);
 
-	// Set the sampler state in the pixel shader.
-	deviceContext->PSSetSamplers(0, 1, &_sampleState);
+	//deviceContext->DrawIndexed(indexCount, 0, 0);
+	deviceContext->DrawIndexedInstanced(indexCount, 2, 0, 0, 0);
+}
 
-	// Render the triangle.
-	deviceContext->DrawIndexed(indexCount, 0, 0);
+void LightShader::SetShaderParameters(D3D& d3D, const GraphicsState& graphicsState)
+{
+
 }

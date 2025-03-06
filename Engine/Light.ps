@@ -14,24 +14,32 @@ struct PixelInput
     float4 color: COLOR;
     float4 position: SV_POSITION;
 	float4 normal: NORMAL;
+    float3 viewDirection: VIEW_DIR;
 };
 
 float4 LightPixelShader(PixelInput input) : SV_TARGET
 {
 	// Invert the light direction for calculations.
-    float3 lightDir = -lightDirection;
+    float3 lightDir = -normalize(lightDirection);
 
     float3 normal = normalize(input.normal.xyz);
+    float3 viewDir = normalize(input.viewDirection);
+
+    float3 reflectDir = reflect(-lightDir, normal);
+    reflectDir = normalize(reflectDir);
 
     // Calculate the amount of light on this pixel.
-    float lightIntensity = abs(dot(normal, lightDir));
+    // saturate() clamps the value between 0 and 1.
+    float lightIntensity = saturate(dot(normal, lightDir));
 
     float4 color = input.color;
     float azimuth = color.a;
     color.a = 1.0f;
     // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
-    color = color * saturate(diffuseColor * lightIntensity);
     color = color * max(abs(sin(8 * azimuth)), 0.35); // arbuz
+    
+    color = color * saturate(diffuseColor * lightIntensity);
+    color = color + pow(saturate(dot(reflectDir, lightDir)), 4);
 
 	return color;
 }

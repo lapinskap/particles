@@ -14,7 +14,7 @@ Application::Application(uint screenWidth, uint screenHeight, HWND hwnd)
 	_lightShader = std::make_unique<LightShader>(_direct3D);
 
 	_light.diffuseColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	_light.direction = DirectX::XMFLOAT3(0.5f, -0.5f, 1.0f);
+	_light.direction = DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f);
 }
 
 bool Application::Render(float rotation)
@@ -38,9 +38,8 @@ bool Application::Render(float rotation)
 	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	_model->Render(_direct3D);
 
-
 	// Render the model using the color shader.
-	bool result = _lightShader->Render(_direct3D, _model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, _light, rotation);
+	bool result = _lightShader->Render_Old(_direct3D, _model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix, _light, rotation);
 	if (!result)
 		return false;
 
