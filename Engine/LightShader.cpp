@@ -7,7 +7,7 @@ const WCHAR* psFilename = L"../Engine/Light.ps";
 
 struct MatrixBuffer
 {
-	DirectX::XMMATRIX world[2];
+	DirectX::XMMATRIX world[10];
 	DirectX::XMMATRIX view;
 	DirectX::XMMATRIX projection;
 };
@@ -38,16 +38,16 @@ LightShader::LightShader(D3D& d3D)
 }
 
 bool LightShader::Render_Old(D3D& d3D, int indexCount,
-						DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
+	const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 						Light& light, float time)
 {
 	// Set the shader parameters that it will use for rendering.
-	bool result = SetShaderParameters(d3D, worldMatrix, viewMatrix, projectionMatrix, light, time);
+	bool result = SetShaderParameters(d3D, worldMatrices, viewMatrix, projectionMatrix, light, time);
 	if (!result)
 		return false;
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(d3D, indexCount);
+	RenderShader(d3D, indexCount, worldMatrices);
 
 	return true;
 }
@@ -115,11 +115,8 @@ bool LightShader::InitializeShader(D3D& d3D)
 	D3D11_INPUT_ELEMENT_DESC vertexLayout[4];
 
 	vertexLayout[0] = renderVertexLayout("POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0);
-
 	vertexLayout[1] = renderVertexLayout("COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_APPEND_ALIGNED_ELEMENT);
-
 	vertexLayout[2] = renderVertexLayout("NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, D3D11_APPEND_ALIGNED_ELEMENT);
-
 	vertexLayout[3] = renderVertexLayout("SV_InstanceID", 0, DXGI_FORMAT_R32_UINT, D3D11_APPEND_ALIGNED_ELEMENT);
 
 	// Get a count of the elements in the layout.
@@ -192,15 +189,13 @@ bool LightShader::InitializeShader(D3D& d3D)
 	return true;
 }
 
-bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, 
+bool LightShader::SetShaderParameters(D3D& d3D, const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 												Light& light, float time)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-	// Transpose the matrices to prepare them for the shader.
-	DirectX::XMMATRIX worldMatrix0 = XMMatrixTranspose(worldMatrix);
-	DirectX::XMMATRIX worldMatrix1 = XMMatrixTranspose(worldMatrix * DirectX::XMMatrixTranslation(2.0f, 0.0f, 0.0f));
+
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
@@ -213,11 +208,12 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 
 	{
 		// Get a pointer to the data in the constant buffer.
-		MatrixBuffer* dataPtr = (MatrixBuffer*)mappedResource.pData;
+		MatrixBuffer* dataPtr = reinterpret_cast<MatrixBuffer*>(mappedResource.pData);
 
 		// Copy the matrices into the constant buffer.
-		dataPtr->world[0] = worldMatrix0;
-		dataPtr->world[1] = worldMatrix1;
+		for (int i = 0; i < worldMatrices.size(); i++)
+			dataPtr->world[i] = worldMatrices[i];
+
 		dataPtr->view = viewMatrix;
 		dataPtr->projection = projectionMatrix;
 	}
@@ -251,7 +247,7 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 
 	{
 		// Get a pointer to the data in the constant buffer.
-		LightBuffer* dataPtr = (LightBuffer*)mappedResource.pData;
+		LightBuffer* dataPtr = reinterpret_cast<LightBuffer*>(mappedResource.pData);
 
 		// Copy the lighting variables into the constant buffer.
 		dataPtr->diffuseColor = light.diffuseColor;
@@ -270,7 +266,7 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 
 	{
 		// Get a pointer to the data in the constant buffer.
-		TimeBuffer* dataPtr = (TimeBuffer*)mappedResource.pData;
+		TimeBuffer* dataPtr = reinterpret_cast<TimeBuffer*>(mappedResource.pData);
 
 		// Copy the lighting variables into the constant buffer.
 		dataPtr->time = time;
@@ -287,7 +283,7 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 }
 
 
-void LightShader::RenderShader(D3D& d3D, int indexCount)
+void LightShader::RenderShader(D3D& d3D, int indexCount, const std::vector<DirectX::XMMATRIX>& worldMatrices)
 {
 	auto deviceContext = d3D.GetDeviceContext();
 	// Set the vertex input layout.
@@ -298,7 +294,8 @@ void LightShader::RenderShader(D3D& d3D, int indexCount)
 	deviceContext->PSSetShader(_pixelShader.get(), nullptr, 0);
 
 	//deviceContext->DrawIndexed(indexCount, 0, 0);
-	deviceContext->DrawIndexedInstanced(indexCount, 2, 0, 0, 0);
+	// vector.size(), of matrixes
+	deviceContext->DrawIndexedInstanced(indexCount, worldMatrices.size(), 0, 0, 0);
 }
 
 void LightShader::SetShaderParameters(D3D& d3D, const GraphicsState& graphicsState)

@@ -14,7 +14,7 @@ public:
 	LightShader(D3D& d3D);
 
 	bool Render_Old(D3D& d3D, int indexCount,
-		DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
+		const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 		Light& light, float time);
 
 private:
@@ -22,9 +22,9 @@ private:
 	bool InitializeShader(D3D& d3D);
 	D3D11_INPUT_ELEMENT_DESC renderVertexLayout(const char* semanticName, uint semanticIndex, DXGI_FORMAT format, uint alignedByteOffset);
 
-	bool SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
+	bool SetShaderParameters(D3D& d3D, const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 										Light& light, float time);
-	void RenderShader(D3D& d3D, int indexCount);
+	void RenderShader(D3D& d3D, int indexCount, const std::vector<DirectX::XMMATRIX>& worldMatrices);
 
 	void SetShaderParameters(D3D& d3D, const GraphicsState& graphicsState) override;
 	
