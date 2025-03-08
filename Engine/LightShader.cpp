@@ -195,7 +195,6 @@ bool LightShader::SetShaderParameters(D3D& d3D, const std::vector<DirectX::XMMAT
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 
-
 	viewMatrix = XMMatrixTranspose(viewMatrix);
 	projectionMatrix = XMMatrixTranspose(projectionMatrix);
 
@@ -271,7 +270,6 @@ bool LightShader::SetShaderParameters(D3D& d3D, const std::vector<DirectX::XMMAT
 		// Copy the lighting variables into the constant buffer.
 		dataPtr->time = time;
 	}
-
 
 	// Unlock the constant buffer.
 	deviceContext->Unmap(_timeBuffer.get(), 0);

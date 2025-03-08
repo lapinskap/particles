@@ -28,7 +28,7 @@ std::vector<Model::Vertex> SphereModel::CreateVertices() const
 			//std::cout << "x: " << x << " y: " << y << " z: " << z << std::endl;
 
 			DirectX::XMFLOAT4 position = { x, y, z, 1.0f };
-			DirectX::XMFLOAT4 color = { 0.2f, 0.5f, 0.2f, fabs(azimuthalAngle - DirectX::XM_PI) };
+			DirectX::XMFLOAT4 color = { modelColor.x, modelColor.y,modelColor.z, fabs(azimuthalAngle - DirectX::XM_PI)};
 			DirectX::XMFLOAT4 normal = { x, y, z, 0.0f };
 
 			vertices.push_back({ position, color, normal });
@@ -40,7 +40,7 @@ std::vector<Model::Vertex> SphereModel::CreateVertices() const
 	// South pole
 	{
 		DirectX::XMFLOAT4 position = { 0.0f, -1.0f, 0.0f, 1.0f };
-		DirectX::XMFLOAT4 color = { 0.2f, 0.5f, 0.2f, 0.0f };
+		DirectX::XMFLOAT4 color = { modelColor.x, modelColor.y,modelColor.z, 0.0f };
 		DirectX::XMFLOAT4 normal = { 0.0f, -1.0f, 0.0f, 0.0f };
 
 		vertices.push_back({ position, color, normal });
@@ -49,7 +49,7 @@ std::vector<Model::Vertex> SphereModel::CreateVertices() const
 	// North pole
 	{
 		DirectX::XMFLOAT4 position = { 0.0f, 1.0f, 0.0f, 1.0f };
-		DirectX::XMFLOAT4 color = { 0.2f, 0.5f, 0.2f, 0.0f };
+		DirectX::XMFLOAT4 color = { modelColor.x, modelColor.y,modelColor.z, 0.0f };
 		DirectX::XMFLOAT4 normal = { 0.0f, 1.0f, 0.0f, 0.0f };
 
 		vertices.push_back({ position, color, normal });
@@ -84,14 +84,14 @@ std::vector<uint> SphereModel::CreateIndices() const
 	constexpr int northPoleIndex = southPoleIndex + 1;
 
 	// Poles
-	// South pole - Wroclaw
+	// South pole
 	for (int i = 0; i < NUM_SEGMENTS; i++)
 	{
 		indices.push_back(i);
 		indices.push_back((i + 1) % NUM_SEGMENTS);
 		indices.push_back(southPoleIndex);
 	}
-	// North pole - Gdansk
+	// North pole
 	for (int i = 0; i < NUM_SEGMENTS; i++)
 	{
 		indices.push_back((NUM_SEGMENTS - 1) * NUM_SEGMENTS + i);

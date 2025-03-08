@@ -5,6 +5,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Source Files\SceneGraph">
+      <UniqueIdentifier>{e4c06973-9e40-435a-b507-1ad2552d3de8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Application.h">
@@ -40,6 +43,28 @@
     <ClInclude Include="Texture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode_Render.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode_SetModel.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode_SetShader.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode_Transform.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsState.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -73,6 +98,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Model.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode_Render.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode_SetModel.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode_SetShader.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode_Transform.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InstanceRendering\Example.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

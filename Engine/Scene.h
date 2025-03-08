@@ -21,7 +21,7 @@ public:
 
 private:
 
-	std::unique_ptr<Model> _model;
+	std::vector<std::unique_ptr<SphereModel>> _models;
 	std::unique_ptr<LightShader> _lightShader;
 	Light _light;
 	Camera _camera;

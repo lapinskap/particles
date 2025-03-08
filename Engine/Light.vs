@@ -1,7 +1,7 @@
 // constant buffer for the matrices, legacy from DirectX 8/9
 cbuffer MatrixBuffer
 {
-    matrix worldMatrix[2];
+    matrix worldMatrix[10];
     matrix viewMatrix;
     matrix projectionMatrix; 
 };

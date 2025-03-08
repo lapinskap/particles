@@ -9,7 +9,10 @@
 #include <fstream>
 #include <format>
 #include <stdint.h>
+#include <directxmath.h>
 
 using uint = unsigned int;
 using uchar = unsigned char;
 using ushort = unsigned short;
+
+namespace DX = DirectX;

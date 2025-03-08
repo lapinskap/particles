@@ -44,6 +44,9 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -79,10 +82,18 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="D3D.h" />
+    <ClInclude Include="GraphicsState.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="ReleasePtr.h" />
+    <ClInclude Include="Scene.h" />
+    <ClInclude Include="SceneGraph\SceneNode.h" />
+    <ClInclude Include="SceneGraph\SceneNode_Render.h" />
+    <ClInclude Include="SceneGraph\SceneNode_SetModel.h" />
+    <ClInclude Include="SceneGraph\SceneNode_SetShader.h" />
+    <ClInclude Include="SceneGraph\SceneNode_Transform.h" />
+    <ClInclude Include="Shader.h" />
     <ClInclude Include="SphereModel.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Texture.h" />
@@ -92,10 +103,18 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="InstanceRendering\Example.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="Model.h" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="SceneGraph\SceneNode.cpp" />
+    <ClCompile Include="SceneGraph\SceneNode_Render.cpp" />
+    <ClCompile Include="SceneGraph\SceneNode_SetModel.cpp" />
+    <ClCompile Include="SceneGraph\SceneNode_SetShader.cpp" />
+    <ClCompile Include="SceneGraph\SceneNode_Transform.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="SphereModel.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Texture.cpp" />

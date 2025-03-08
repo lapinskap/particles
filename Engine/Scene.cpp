@@ -9,9 +9,18 @@ void Scene::Initialize(D3D& d3D)
 	// Set the initial position of the camera.
 	_camera.SetPosition(0.0f, 0.0f, -5.0f);
 
-	// Create and initialize the model object.
-	_model = std::make_unique<SphereModel>();
-	_model->Initialize(d3D);
+	std::vector<DirectX::XMFLOAT3> colors = {
+		{ 1.0f, 0.0f, 0.0f },
+		{ 0.0f, 1.0f, 0.0f },
+		{ 0.0f, 0.0f, 1.0f }
+	};
+
+	for (const auto& color : colors)
+	{
+		auto model = std::make_unique<SphereModel>(color);
+		model->Initialize(d3D);
+		_models.push_back(std::move(model));
+	}
 
 	_lightShader = std::make_unique<LightShader>(d3D);
 
@@ -35,20 +44,26 @@ bool Scene::Render(D3D& d3D, float rotation)
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
 	worldMatrix = DirectX::XMMatrixRotationY(rotation);
 
-	// Transpose the matrices to prepare them for the shader.	
-	std::vector<DirectX::XMMATRIX> worldMatrices = {
-		XMMatrixTranspose(worldMatrix * DirectX::XMMatrixTranslation(-2.0f, 0.0f, 0.0f)),
-		XMMatrixTranspose(worldMatrix * DirectX::XMMatrixTranslation(-0.5f, -1.0f, 0.0f)),
-		XMMatrixTranspose(worldMatrix * DirectX::XMMatrixTranslation(0.0f, 2.0f, 0.0f))
+
+	std::vector<DirectX::XMMATRIX> translations = {
+		DirectX::XMMatrixTranslation(-2.0f, 0.0f, 0.0f),
+		DirectX::XMMatrixTranslation(-0.5f, -1.0f, 0.0f),
+		DirectX::XMMatrixTranslation(0.0f, 2.0f, 0.0f)
 	};
 
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	_model->Render(d3D);
+	for (size_t i = 0; i < _models.size(); ++i)
+	{
+		// Transpose the matrices to prepare them for the shader.
+		DirectX::XMMATRIX worldMatrixTransposed = DirectX::XMMatrixTranspose(worldMatrix * translations[i]);
 
-	// Render the model using the color shader.
-	bool result = _lightShader->Render_Old(d3D, _model->GetIndexCount(), worldMatrices, viewMatrix, projectionMatrix, _light, rotation);
-	if (!result)
-		return false;
+		// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+		_models[i]->Render(d3D);
+
+		// Render the model using the light shader.
+		bool result = _lightShader->Render_Old(d3D, _models[i]->GetIndexCount(), { worldMatrixTransposed }, viewMatrix, projectionMatrix, _light, rotation);
+		if (!result)
+			return false;
+	}
 
 	return true;
 }
