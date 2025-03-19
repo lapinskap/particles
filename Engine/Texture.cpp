@@ -163,3 +163,41 @@ ushort Texture::GetHeight() const
 {
     return _height;
 }
+
+//void Texture::RenderShader(ID3D11DeviceContext* deviceContext, int vertexCount, int instanceCount)
+//{
+//	// Set the vertex input layout.
+//	deviceContext->IASetInputLayout(_layout);
+//
+//	// Set the vertex and pixel shaders that will be used to render this triangle.
+//	deviceContext->VSSetShader(_vertexShader, NULL, 0);
+//	deviceContext->PSSetShader(_pixelShader, NULL, 0);
+//
+//	// Set the sampler state in the pixel shader.
+//	deviceContext->PSSetSamplers(0, 1, &_sampleState);
+//
+//	// Render the triangle.
+//	deviceContext->DrawInstanced(vertexCount, instanceCount, 0, 0);
+//
+//	return;
+//}
+//
+//
+//bool Texture::Render(ID3D11DeviceContext* deviceContext, int vertexCount, int instanceCount, DirectX::XMMATRIX worldMatrix,
+//	DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, ID3D11ShaderResourceView* texture)
+//{
+//	bool result;
+//
+//
+//	// Set the shader parameters that it will use for rendering.
+//	result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture);
+//	if (!result)
+//	{
+//		return false;
+//	}
+//
+//	// Now render the prepared buffers with the shader.
+//	RenderShader(deviceContext, vertexCount, instanceCount);
+//
+//	return true;
+//}
