@@ -4,7 +4,7 @@
 
 const int NUM_SEGMENTS = 10;
 
-std::vector<Model::Vertex> SphereModel::CreateVertices() const
+std::vector<InstancedModel::Vertex> SphereModel::CreateVertices() const
 {
 	std::vector<Vertex> vertices;
 
