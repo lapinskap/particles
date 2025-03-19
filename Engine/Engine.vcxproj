@@ -84,6 +84,7 @@
     <ClInclude Include="D3D.h" />
     <ClInclude Include="GraphicsState.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="InstancedModel.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="LightShader.h" />
     <ClInclude Include="ReleasePtr.h" />
@@ -103,7 +104,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="D3D.cpp" />
     <ClCompile Include="Input.cpp" />
-    <ClCompile Include="InstanceRendering\Example.cpp" />
+    <ClCompile Include="InstancedModel.cpp" />
     <ClCompile Include="LightShader.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Model.cpp" />

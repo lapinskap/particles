@@ -1,7 +1,7 @@
 #pragma once
-#include "InstancedModel.h"
+#include "Model.h"
 
-class SphereModel : public InstancedModel
+class SphereModel : public Model
 {
 public:
 	SphereModel() = default;

@@ -17,6 +17,7 @@ struct VertexInput
     float4 color: COLOR;
     float4 normal: NORMAL;
     uint instanceID: SV_INSTANCEID;
+    //float3 instancePosition : TEXCOORD1;
 };
 
 // TODO: learn about alignment and padding in HLSL

@@ -65,6 +65,7 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="InstancedModel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -118,10 +119,10 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InstanceRendering\Example.cpp">
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="InstancedModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
