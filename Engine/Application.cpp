@@ -1,10 +1,12 @@
 #include "Application.h"
-
+#include "System.h"
 
 Application::Application(uint screenWidth, uint screenHeight, HWND hwnd)
 	: _direct3D(D3D::InitParams{ hwnd, screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH, VSYNC_ENABLED, FULL_SCREEN })
 {
 	_scene.Initialize(_direct3D);
+	// Pass the camera pointer to the system
+	_system->Initialize(&_scene.GetCamera());
 }
 
 bool Application::Render(float rotation)
@@ -30,6 +32,9 @@ bool Application::Frame()
 	{
 		rotation = 0.0f;
 	}
+
+	// Update the system to handle input and update the camera position
+	_system->Run();
 
 	return Render(rotation);
 }

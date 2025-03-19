@@ -16,6 +16,10 @@ public:
 
 	void Initialize(D3D& d3D);
 	bool Render(D3D& d3D, float rotation);
+	Camera& GetCamera() 
+	{ 
+		return _camera;
+	}
 
 	virtual ~Scene() = default;
 

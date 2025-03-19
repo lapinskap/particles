@@ -10,6 +10,8 @@ const bool VSYNC_ENABLED = true;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.3f;
 
+class System;
+
 class Application
 {
 public:
@@ -20,8 +22,9 @@ public:
 
 private:
 
-	bool Render(float);
+	bool Render(float rotation);
 
 	D3D _direct3D;
 	Scene _scene;
+	System* _system = nullptr;
 };
