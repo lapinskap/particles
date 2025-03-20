@@ -13,10 +13,12 @@ cbuffer ViewBuffer
 
 struct VertexInput
 {
+    ///////////VERTEX DATA//////////////
     float4 position: POSITION;
     float4 color: COLOR;
     float4 normal: NORMAL;
-    /////////////////////////
+
+    ///////////INSTANCE DATA//////////////
     float3 instancePosition : TEXCOORD0;
 };
 

@@ -1,8 +1,6 @@
 #include "Scene.h"
 #include "D3D.h"
 #include "Common.h"
-#include <math.h>
-#include <iostream>
 
 void Scene::Initialize(D3D& d3D)
 {
@@ -10,6 +8,15 @@ void Scene::Initialize(D3D& d3D)
 	_camera.SetPosition(0.0f, 0.0f, -5.0f);
 
 	_model.Initialize(d3D);
+
+	std::vector<InstancedModel::Instance> instances
+	{
+		{{0.0f, 1.0f, 0.0f}},
+		{{-1.5f, -1.0f, 0.0f}},
+		{{1.5f, -1.0f, 0.0f}},
+	};
+
+	_instancedModel.Initialize(d3D, &_model, instances);
 
 	_lightShader = std::make_unique<LightShader>(d3D);
 
@@ -29,22 +36,21 @@ bool Scene::Render(D3D& d3D, float dt)
 	_camera.GetViewMatrix(viewMatrix);
 	d3D.GetProjectionMatrix(projectionMatrix);
 
-	static float rotation = 0.0f;
-	rotation += 0.1f * dt;
-	if (rotation > 360.0f)
-		rotation = 0.0f;
+	static float time = 0.0f;
+	time += dt;
+
+	float rotation = 0.1f * time;
 
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
 	worldMatrix = DirectX::XMMatrixRotationY(rotation);
 
-	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-	_model.Render(d3D);
+	_instancedModel.ApplyBuffers(d3D);
 
 	// Render the model using the light shader.
 	bool result = _lightShader->Render_Old(d3D, 
-										   _model.GetVertexCount(), _model.GetIndexCount(), _model.GetInstanceCount(), 
+										   _model.GetIndexCount(), _instancedModel.GetInstanceCount(),
 										   worldMatrix, viewMatrix, projectionMatrix, 
-										   _light, rotation);
+										   _light);
 	if (!result)
 		return false;
 

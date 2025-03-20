@@ -37,17 +37,17 @@ LightShader::LightShader(D3D& d3D)
 	InitializeShader(d3D);
 }
 
-bool LightShader::Render_Old(D3D& d3D, int vertexCount, int indexCount, int instanceCount,
+bool LightShader::Render_Old(D3D& d3D, int indexCount, int instanceCount,
 	DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-						Light& light, float time)
+						Light& light)
 {
 	// Set the shader parameters that it will use for rendering.
-	bool result = SetShaderParameters(d3D, worldMatrix, viewMatrix, projectionMatrix, light, time);
+	bool result = SetShaderParameters(d3D, worldMatrix, viewMatrix, projectionMatrix, light);
 	if (!result)
 		return false;
 
 	// Now render the prepared buffers with the shader.
-	RenderShader(d3D, vertexCount, indexCount, instanceCount, worldMatrix);
+	RenderShader(d3D, indexCount, instanceCount, worldMatrix);
 
 	return true;
 }
@@ -119,8 +119,6 @@ bool LightShader::InitializeShader(D3D& d3D)
 	matrixBufferDesc.ByteWidth = sizeof(MatrixBuffer);
 	matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	matrixBufferDesc.MiscFlags = 0;
-	matrixBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	result = device->CreateBuffer(&matrixBufferDesc, nullptr, &_matrixBuffer);
@@ -133,8 +131,6 @@ bool LightShader::InitializeShader(D3D& d3D)
 	viewBufferDesc.ByteWidth = sizeof(ViewBuffer);
 	viewBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	viewBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	viewBufferDesc.MiscFlags = 0;
-	viewBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	result = device->CreateBuffer(&viewBufferDesc, nullptr, &_viewBuffer);
@@ -149,33 +145,16 @@ bool LightShader::InitializeShader(D3D& d3D)
 	lightBufferDesc.ByteWidth = sizeof(LightBuffer);
 	lightBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	lightBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	lightBufferDesc.MiscFlags = 0;
-	lightBufferDesc.StructureByteStride = 0;
 
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	result = device->CreateBuffer(&lightBufferDesc, nullptr, &_lightBuffer);
 	if (FAILED(result))
 		throw D3DError("Failed to create a light buffer");
 
-	D3D11_BUFFER_DESC timeBufferDesc;
-	ZeroMemory(&timeBufferDesc, sizeof(timeBufferDesc));
-	timeBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	timeBufferDesc.ByteWidth = sizeof(TimeBuffer);
-	timeBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	timeBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	timeBufferDesc.MiscFlags = 0;
-	timeBufferDesc.StructureByteStride = 0;
-
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	result = device->CreateBuffer(&timeBufferDesc, nullptr, &_timeBuffer);
-	if (FAILED(result))
-		throw D3DError("Failed to create a time buffer");
-
 	return true;
 }
 
-bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-												Light& light, float time)
+bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, Light& light)
 {
 	HRESULT result;
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -242,29 +221,11 @@ bool LightShader::SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, D
 	// Finally set the light constant buffer in the pixel shader with the updated values.
 	deviceContext->PSSetConstantBuffers(0, 1, &_lightBuffer);
 
-	result = deviceContext->Map(_timeBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	if (FAILED(result))
-		return false;
-
-	{
-		// Get a pointer to the data in the constant buffer.
-		TimeBuffer* dataPtr = reinterpret_cast<TimeBuffer*>(mappedResource.pData);
-
-		// Copy the lighting variables into the constant buffer.
-		dataPtr->time = time;
-	}
-
-	// Unlock the constant buffer.
-	deviceContext->Unmap(_timeBuffer.get(), 0);
-
-	// Finally set the light constant buffer in the pixel shader with the updated values.
-	deviceContext->PSSetConstantBuffers(1, 1, &_timeBuffer);
-
 	return true;
 }
 
 
-void LightShader::RenderShader(D3D& d3D, int vertexCount, int indexCount, int instanceCount, DirectX::XMMATRIX worldMatrix)
+void LightShader::RenderShader(D3D& d3D, int indexCount, int instanceCount, DirectX::XMMATRIX worldMatrix)
 {
 	auto deviceContext = d3D.GetDeviceContext();
 	// Set the vertex input layout.
@@ -275,9 +236,4 @@ void LightShader::RenderShader(D3D& d3D, int vertexCount, int indexCount, int in
 	deviceContext->PSSetShader(_pixelShader.get(), nullptr, 0);
 
 	deviceContext->DrawIndexedInstanced(indexCount, instanceCount, 0, 0, 0);
-}
-
-void LightShader::SetShaderParameters(D3D& d3D, const GraphicsState& graphicsState)
-{
-
 }

@@ -16,7 +16,6 @@ public:
 	void Render(D3D& d3D, const GraphicsState& GraphicsState);
 
 protected:
-	virtual void SetShaderParameters(D3D& d3D, const GraphicsState& GraphicsState) = 0;
 
 	ReleasePtr<ID3D11VertexShader> _vertexShader;
 	ReleasePtr<ID3D11PixelShader> _pixelShader;

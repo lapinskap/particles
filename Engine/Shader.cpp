@@ -20,7 +20,7 @@ void Shader::Render(D3D& d3D, const GraphicsState& GraphicsState)
 	// Set the constant buffer.
 	d3D.GetDeviceContext()->VSSetConstantBuffers(0, 1, &_matrixBuffer);
 
-	SetShaderParameters(d3D, GraphicsState);
+	//SetShaderParameters(d3D, GraphicsState);
 
 	// Render the triangle.
 	//d3D.GetDeviceContext()->DrawIndexed(GraphicsState.model->GetIndexCount(), 0, 0);

@@ -4,6 +4,7 @@
 
 #include "Camera.h"
 #include "SphereModel.h"
+#include "InstancedModel.h"
 #include "LightShader.h"
 #include "Light.h"
 
@@ -21,6 +22,7 @@ public:
 private:
 
 	SphereModel _model;
+	InstancedModel _instancedModel;
 	std::unique_ptr<LightShader> _lightShader;
 	Light _light;
 	Camera _camera;
