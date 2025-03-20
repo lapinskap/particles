@@ -9,18 +9,7 @@ void Scene::Initialize(D3D& d3D)
 	// Set the initial position of the camera.
 	_camera.SetPosition(0.0f, 0.0f, -5.0f);
 
-	std::vector<DirectX::XMFLOAT3> colors = {
-		{ 1.0f, 0.0f, 0.0f },
-		{ 0.0f, 1.0f, 0.0f },
-		{ 0.0f, 0.0f, 1.0f }
-	};
-
-	for (const auto& color : colors)
-	{
-		auto model = std::make_unique<SphereModel>(color);
-		model->Initialize(d3D);
-		_models.push_back(std::move(model));
-	}
+	_model.Initialize(d3D);
 
 	_lightShader = std::make_unique<LightShader>(d3D);
 
@@ -28,9 +17,8 @@ void Scene::Initialize(D3D& d3D)
 	_light.direction = DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f);
 }
 
-bool Scene::Render(D3D& d3D, float rotation)
+bool Scene::Render(D3D& d3D, float dt)
 {
-
 	DirectX::XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
 
 	// Generate the view matrix based on the camera's position.
@@ -41,29 +29,24 @@ bool Scene::Render(D3D& d3D, float rotation)
 	_camera.GetViewMatrix(viewMatrix);
 	d3D.GetProjectionMatrix(projectionMatrix);
 
+	static float rotation = 0.0f;
+	rotation += 0.1f * dt;
+	if (rotation > 360.0f)
+		rotation = 0.0f;
+
 	// Rotate the world matrix by the rotation value so that the triangle will spin.
 	worldMatrix = DirectX::XMMatrixRotationY(rotation);
 
+	// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
+	_model.Render(d3D);
 
-	std::vector<DirectX::XMMATRIX> translations = {
-		DirectX::XMMatrixTranslation(-2.0f, 0.0f, 0.0f),
-		DirectX::XMMatrixTranslation(-0.5f, -1.0f, 0.0f),
-		DirectX::XMMatrixTranslation(0.0f, 2.0f, 0.0f)
-	};
-
-	for (size_t i = 0; i < _models.size(); ++i)
-	{
-		// Transpose the matrices to prepare them for the shader.
-		DirectX::XMMATRIX worldMatrixTransposed = DirectX::XMMatrixTranspose(worldMatrix * translations[i]);
-
-		// Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
-		_models[i]->Render(d3D);
-
-		// Render the model using the light shader.
-		bool result = _lightShader->Render_Old(d3D, _models[i]->GetIndexCount(), { worldMatrixTransposed }, viewMatrix, projectionMatrix, _light, rotation);
-		if (!result)
-			return false;
-	}
+	// Render the model using the light shader.
+	bool result = _lightShader->Render_Old(d3D, 
+										   _model.GetVertexCount(), _model.GetIndexCount(), _model.GetInstanceCount(), 
+										   worldMatrix, viewMatrix, projectionMatrix, 
+										   _light, rotation);
+	if (!result)
+		return false;
 
 	return true;
 }

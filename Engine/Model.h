@@ -14,7 +14,9 @@ public:
 	void Initialize(D3D& d3D);
 	void Render(D3D& d3D);
 
+	int GetVertexCount();
 	int GetIndexCount();
+	int GetInstanceCount();
 
 	virtual ~Model() = default;
 
@@ -26,11 +28,16 @@ protected:
 		DirectX::XMFLOAT4 normal;
 	};
 
+	struct Instance
+	{
+		DX::XMFLOAT3 position;
+	};
+
 	virtual std::vector<Vertex> CreateVertices() const;
 	virtual std::vector<uint> CreateIndices() const;
 	int _vertexCount = 0;
 	int _indexCount = 0;
-
+	int _instanceCount = 0;
 
 private:
 
@@ -39,5 +46,5 @@ private:
 
 	ReleasePtr<ID3D11Buffer> _vertexBuffer;
 	ReleasePtr<ID3D11Buffer> _indexBuffer;
-	std::unique_ptr<Texture> _texture;
+	ReleasePtr<ID3D11Buffer> _instanceBuffer;
 };

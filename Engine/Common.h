@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <format>
+#include <chrono>
 #include <stdint.h>
 #include <directxmath.h>
 

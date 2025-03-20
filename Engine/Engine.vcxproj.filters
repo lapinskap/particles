@@ -119,10 +119,10 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InstanceRendering\Example.cpp">
+    <ClCompile Include="Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Scene.cpp">
+    <ClCompile Include="InstancedModel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InstancedModel.cpp">

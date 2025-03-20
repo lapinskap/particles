@@ -23,6 +23,6 @@ void Shader::Render(D3D& d3D, const GraphicsState& GraphicsState)
 	SetShaderParameters(d3D, GraphicsState);
 
 	// Render the triangle.
-	d3D.GetDeviceContext()->DrawIndexed(GraphicsState.model->GetIndexCount(), 0, 0);
+	//d3D.GetDeviceContext()->DrawIndexed(GraphicsState.model->GetIndexCount(), 0, 0);
 }
 

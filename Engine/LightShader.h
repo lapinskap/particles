@@ -13,18 +13,17 @@ class LightShader : public Shader
 public:
 	LightShader(D3D& d3D);
 
-	bool Render_Old(D3D& d3D, int indexCount,
-		const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
+	bool Render_Old(D3D& d3D, int vertexCount, int indexCount, int instanceCount,
+		DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 		Light& light, float time);
 
 private:
 
 	bool InitializeShader(D3D& d3D);
-	D3D11_INPUT_ELEMENT_DESC renderVertexLayout(const char* semanticName, uint semanticIndex, DXGI_FORMAT format, uint alignedByteOffset);
 
-	bool SetShaderParameters(D3D& d3D, const std::vector<DirectX::XMMATRIX>& worldMatrices, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
+	bool SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
 										Light& light, float time);
-	void RenderShader(D3D& d3D, int indexCount, const std::vector<DirectX::XMMATRIX>& worldMatrices);
+	void RenderShader(D3D& d3D, int vertexCount, int indexCount, int instanceCount, DirectX::XMMATRIX worldMatrix);
 
 	void SetShaderParameters(D3D& d3D, const GraphicsState& graphicsState) override;
 	

@@ -16,7 +16,6 @@ System::System()
 	{
 		freopen("CONOUT$", "w", stdout);
 	}
-	
 
 	// Initialize the width and height of the screen to zero before sending the variables into the function.
 	uint screenWidth = 0;
@@ -79,7 +78,8 @@ bool System::Frame()
 	}
 
 	// Do the frame processing for the application class object.
-	return _application->Frame();
+	_application->Frame();
+	return true;
 }
 
 LRESULT CALLBACK System::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)

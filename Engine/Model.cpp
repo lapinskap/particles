@@ -15,9 +15,19 @@ void Model::Render(D3D& d3D)
 	RenderBuffers(d3D);
 }
 
+int Model::GetVertexCount()
+{
+	return _vertexCount;
+}
+
 int Model::GetIndexCount()
 {
 	return _indexCount;
+}
+
+int Model::GetInstanceCount()
+{
+	return _instanceCount;
 }
 
 std::vector<Model::Vertex> Model::CreateVertices() const
@@ -62,18 +72,15 @@ void Model::InitializeBuffers(D3D& d3D)
 
 	// Set up the description of the static vertex buffer.
 	D3D11_BUFFER_DESC vertexBufferDesc;
+	ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 	vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vertexBufferDesc.ByteWidth = sizeof(Vertex) * vertices.size();
+	vertexBufferDesc.ByteWidth = sizeof(Vertex) * (uint)vertices.size();
 	vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	vertexBufferDesc.CPUAccessFlags = 0;
-	vertexBufferDesc.MiscFlags = 0;
-	vertexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the vertex data.
 	D3D11_SUBRESOURCE_DATA vertexData;
+	ZeroMemory(&vertexData, sizeof(vertexData));
 	vertexData.pSysMem = vertices.data();
-	vertexData.SysMemPitch = 0;
-	vertexData.SysMemSlicePitch = 0;
 
 	ID3D11Device* device = d3D.GetDevice();
 
@@ -84,20 +91,41 @@ void Model::InitializeBuffers(D3D& d3D)
 	if (FAILED(result))
 		throw D3DError("Failed to create a vertex buffer");
 
+	std::vector<Instance> instances
+	{
+		{DX::XMFLOAT3(-1.5f, -1.5f, 0.0f)},
+		{DX::XMFLOAT3(-1.5f, 1.5f, 0.0f)},
+		{DX::XMFLOAT3(1.5f, -1.5f, 0.0f)}
+	};
+
+	_instanceCount = instances.size();
+
+	D3D11_BUFFER_DESC instanceBufferDesc;
+	ZeroMemory(&instanceBufferDesc, sizeof(instanceBufferDesc));
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(Instance) * _instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+
+	D3D11_SUBRESOURCE_DATA instanceData;
+	ZeroMemory(&instanceData, sizeof(instanceData));
+	instanceData.pSysMem = instances.data();
+
+	result = device->CreateBuffer(&instanceBufferDesc, &instanceData, &_instanceBuffer);
+
+	if (FAILED(result))
+		throw D3DError("Failed to create an instance buffer");
+
 	// Set up the description of the static index buffer.
 	D3D11_BUFFER_DESC indexBufferDesc;
+	ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
 	indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
 	indexBufferDesc.ByteWidth = sizeof(uint) * indices.size();
 	indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-	indexBufferDesc.CPUAccessFlags = 0;
-	indexBufferDesc.MiscFlags = 0;
-	indexBufferDesc.StructureByteStride = 0;
 
 	// Give the subresource structure a pointer to the index data.
 	D3D11_SUBRESOURCE_DATA indexData;
+	ZeroMemory(&indexData, sizeof(indexData));
 	indexData.pSysMem = indices.data();
-	indexData.SysMemPitch = 0;
-	indexData.SysMemSlicePitch = 0;
 
 	// Create the index buffer.
 	result = device->CreateBuffer(&indexBufferDesc, &indexData, &_indexBuffer);
@@ -111,15 +139,14 @@ void Model::InitializeBuffers(D3D& d3D)
 void Model::RenderBuffers(D3D& d3D)
 {
 	// Set vertex buffer stride and offset.
-	const uint stride = sizeof(Vertex);
-	const uint offset = 0u;
+	const uint strides[]{ sizeof(Vertex), sizeof(Instance) };
+	const uint offsets[]{ 0u, 0u };
+	ID3D11Buffer* bufferPointers[2] = {_vertexBuffer.get(), _instanceBuffer.get()};
 
 	auto deviceContext = d3D.GetDeviceContext();
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &_vertexBuffer, &stride, &offset);
-
-	// Set the index buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
 	deviceContext->IASetIndexBuffer(_indexBuffer.get(), DXGI_FORMAT_R32_UINT, 0);
 
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.

@@ -16,12 +16,11 @@ public:
 	
 	Application(uint screenWidth, uint screenHeight, HWND hwnd);
 
-	bool Frame();
+	void Frame();
 
 private:
 
-	bool Render(float);
-
 	D3D _direct3D;
 	Scene _scene;
+	std::chrono::time_point<std::chrono::steady_clock> _lastUpdateTimepoint;
 };

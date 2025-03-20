@@ -5,32 +5,21 @@ Application::Application(uint screenWidth, uint screenHeight, HWND hwnd)
 	: _direct3D(D3D::InitParams{ hwnd, screenWidth, screenHeight, SCREEN_NEAR, SCREEN_DEPTH, VSYNC_ENABLED, FULL_SCREEN })
 {
 	_scene.Initialize(_direct3D);
+	_lastUpdateTimepoint = std::chrono::steady_clock::now();
 }
 
-bool Application::Render(float rotation)
+void Application::Frame()
 {
-	DirectX::XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
+	auto beginFrameTimepoint = std::chrono::steady_clock::now();
 
 	// Clear the buffers to begin the scene.
 	_direct3D.BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	_scene.Render(_direct3D, rotation);
+	auto deltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(beginFrameTimepoint - _lastUpdateTimepoint).count();
+	_lastUpdateTimepoint = beginFrameTimepoint;
+
+	_scene.Render(_direct3D, deltaTimeMs);
 
 	// Present the rendered scene to the screen.
 	_direct3D.EndScene();
-
-	return true;
 }
-
-bool Application::Frame()
-{
-	static float rotation = 0.0f;
-	rotation += 0.0174532925f * 0.1f;
-	if (rotation > 360.0f)
-	{
-		rotation = 0.0f;
-	}
-
-	return Render(rotation);
-}
-
