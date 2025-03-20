@@ -27,6 +27,11 @@ System::System()
 	_application = std::make_unique<Application>(screenWidth, screenHeight, _hwnd);
 }
 
+void System::Initialize(Camera* camera)
+{
+	_camera = camera;
+}
+
 System::~System()
 {
 	// Shutdown the window.
@@ -75,6 +80,26 @@ bool System::Frame()
 	if (_input.IsKeyDown(VK_ESCAPE))
 	{
 		return false;
+	}
+
+	if (_camera)
+	{
+		if (_input.IsKeyDown(VK_LEFT))
+		{
+			_camera->SetPosition(_camera->GetPosition().x - 1.0f, _camera->GetPosition().y, _camera->GetPosition().z);
+		}
+		if (_input.IsKeyDown(VK_RIGHT))
+		{
+			_camera->SetPosition(_camera->GetPosition().x + 1.0f, _camera->GetPosition().y, _camera->GetPosition().z);
+		}
+		if (_input.IsKeyDown(VK_UP))
+		{
+			_camera->SetPosition(_camera->GetPosition().x, _camera->GetPosition().y + 1.0f, _camera->GetPosition().z);
+		}
+		if (_input.IsKeyDown(VK_DOWN))
+		{
+			_camera->SetPosition(_camera->GetPosition().x, _camera->GetPosition().y - 1.0f, _camera->GetPosition().z);
+		}
 	}
 
 	// Do the frame processing for the application class object.
