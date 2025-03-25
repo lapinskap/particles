@@ -62,7 +62,6 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Scene.h" />
-    <ClInclude Include="InstancedModel.h" />
     <ClInclude Include="SceneGraph\SceneTraversalState.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
@@ -74,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="SceneGraph\SceneNode_Camera.h">
       <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="InstancedModel.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
