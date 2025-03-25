@@ -35,7 +35,7 @@ struct TimeBuffer
 
 struct Instance
 {
-	DirectX::XMFLOAT3 position;
+	DirectX::XMMATRIX transform;
 };
 
 LightShader::LightShader()
@@ -47,13 +47,16 @@ std::vector<D3D11_INPUT_ELEMENT_DESC> LightShader::GetVertexLayout() const
 {
 	// Create the vertex input layout description.
 	// This setup needs to match the Vertex stucture in the Model and in the shader.
-	std::vector<D3D11_INPUT_ELEMENT_DESC> vertexLayout(4);
-
-	vertexLayout[0] = D3D11_INPUT_ELEMENT_DESC{ "POSITION",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	0,								D3D11_INPUT_PER_VERTEX_DATA,	0 };
-	vertexLayout[1] = D3D11_INPUT_ELEMENT_DESC{ "COLOR",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 };
-	vertexLayout[2] = D3D11_INPUT_ELEMENT_DESC{ "NORMAL",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 };
-	vertexLayout[3] = D3D11_INPUT_ELEMENT_DESC{ "TEXCOORD",	0, DXGI_FORMAT_R32G32B32_FLOAT,		1,	0,								D3D11_INPUT_PER_INSTANCE_DATA,	1 };
-
+	std::vector<D3D11_INPUT_ELEMENT_DESC> vertexLayout
+	{
+		{ "POSITION",		0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	0,								D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "COLOR",			0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "NORMAL",			0, DXGI_FORMAT_R32G32B32A32_FLOAT,	0,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_VERTEX_DATA,	0 },
+		{ "InstTransform",	0, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	0,								D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "InstTransform",	1, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "InstTransform",	2, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 },
+		{ "InstTransform",	3, DXGI_FORMAT_R32G32B32A32_FLOAT,	1,	D3D11_APPEND_ALIGNED_ELEMENT,	D3D11_INPUT_PER_INSTANCE_DATA,	1 }
+	};
 	return vertexLayout;
 }
 
@@ -102,10 +105,7 @@ struct LightShader_SceneData : public SceneData
 {
 	void AddInstanced(const SceneTraversalState& state) override
 	{
-		DX::XMFLOAT3 position(0.0f, 0.0f, 0.0f);
-		DX::XMVECTOR transformedPosition = DX::XMVector3TransformCoord(DirectX::XMLoadFloat3(&position), state.transform);
-		DX::XMStoreFloat3(&position, transformedPosition);
-		instances.push_back(Instance{ position });
+		instances.push_back(Instance{ DX::XMMatrixTranspose(state.transform) });
 		instanceCount++;
 	}
 

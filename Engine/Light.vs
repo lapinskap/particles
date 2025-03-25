@@ -18,7 +18,7 @@ struct VertexInput
     float4 normal: NORMAL;
 
     ///////////INSTANCE DATA//////////////
-    float3 instancePosition : TEXCOORD0;
+    matrix instanceTransform : InstTransform;
 };
 
 // TODO: learn about alignment and padding in HLSL
@@ -38,7 +38,7 @@ PixelInput LightVertexShader(VertexInput input)
     input.position.w = 1.0f;
 
     // Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = input.position + float4(input.instancePosition, 0);
+    output.position = mul(input.position, input.instanceTransform);
 
     output.viewDirection = viewerPosition - output.position.xyz;
     output.viewDirection = normalize(output.viewDirection);
@@ -47,8 +47,7 @@ PixelInput LightVertexShader(VertexInput input)
     output.position = mul(output.position, projectionMatrix);
     
 	// Calculate the normal vector against the world matrix only.
-    //float4 normal = mul(input.normal, worldMatrix);
-    float4 normal = input.normal;
+    float4 normal = mul(input.normal, input.instanceTransform);
 	
     // Normalize the normal vector.
     output.normal = normalize(normal);
