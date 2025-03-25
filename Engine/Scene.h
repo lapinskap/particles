@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Common.h"
 #include "D3D.h"
 
@@ -7,8 +8,11 @@
 #include "InstancedModel.h"
 #include "LightShader.h"
 #include "Light.h"
+#include "SceneGraph/SceneNode.h"
+#include "SceneGraph/SceneGraphExecutor.h"
 
 class D3D;
+class SceneGraphExecutor;
 
 class Scene
 {
@@ -22,8 +26,8 @@ public:
 private:
 
 	SphereModel _model;
-	InstancedModel _instancedModel;
-	std::unique_ptr<LightShader> _lightShader;
 	Light _light;
 	Camera _camera;
+	std::unique_ptr<SceneNode> _rootSceneNode;
+	SceneGraphExecutor _executor;
 };

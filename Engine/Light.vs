@@ -1,7 +1,6 @@
 // constant buffer for the matrices, legacy from DirectX 8/9
 cbuffer MatrixBuffer
 {
-    matrix worldMatrix;
     matrix viewMatrix;
     matrix projectionMatrix; 
 };
@@ -48,7 +47,8 @@ PixelInput LightVertexShader(VertexInput input)
     output.position = mul(output.position, projectionMatrix);
     
 	// Calculate the normal vector against the world matrix only.
-    float4 normal = mul(input.normal, worldMatrix);
+    //float4 normal = mul(input.normal, worldMatrix);
+    float4 normal = input.normal;
 	
     // Normalize the normal vector.
     output.normal = normalize(normal);

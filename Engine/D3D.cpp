@@ -306,9 +306,6 @@ void D3D::InitViewport(const InitParams& initParams)
 
 	// Initialize the world matrix to the identity matrix.
 	_worldMatrix = DirectX::XMMatrixIdentity();
-
-	// Create an orthographic projection matrix for 2D rendering.
-	_orthoMatrix = DirectX::XMMatrixOrthographicLH(screenWidth, screenHeight, initParams.screenNear, initParams.screenFar);
 }
 
 D3D::~D3D()
@@ -361,16 +358,6 @@ ID3D11DeviceContext* D3D::GetDeviceContext()
 void D3D::GetProjectionMatrix(DirectX::XMMATRIX& projectionMatrix)
 {
 	projectionMatrix = _projectionMatrix;
-}
-
-void D3D::GetWorldMatrix(DirectX::XMMATRIX& worldMatrix)
-{
-	worldMatrix = _worldMatrix;
-}
-
-void D3D::GetOrthoMatrix(DirectX::XMMATRIX& orthoMatrix)
-{
-	orthoMatrix = _orthoMatrix;
 }
 
 const std::string& D3D::GetVideoCardInfo() const

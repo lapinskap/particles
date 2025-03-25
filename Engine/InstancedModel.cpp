@@ -3,38 +3,48 @@
 #include "Common.h"
 #include "Model.h"
 
-void InstancedModel::Initialize(D3D& d3D, Model* model, const std::vector<Instance>& instances)
+InstancedModel::InstancedModel(std::shared_ptr<Model> model)
+	: _model(model)
 {
-	_model = model;
-	_instanceCount = instances.size();
+}
+
+void InstancedModel::Initialize(D3D& d3D, size_t instanceSize, uint instanceCount)
+{
+	_model->Initialize(d3D);
 
 	D3D11_BUFFER_DESC instanceBufferDesc;
 	ZeroMemory(&instanceBufferDesc, sizeof(instanceBufferDesc));
-	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	instanceBufferDesc.ByteWidth = sizeof(Instance) * _instanceCount;
+	instanceBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	instanceBufferDesc.ByteWidth = instanceSize * instanceCount;
 	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 
-	D3D11_SUBRESOURCE_DATA instanceData;
-	ZeroMemory(&instanceData, sizeof(instanceData));
-	instanceData.pSysMem = instances.data();
-
-	auto result = d3D.GetDevice()->CreateBuffer(&instanceBufferDesc, &instanceData, &_instanceBuffer);
+	auto result = d3D.GetDevice()->CreateBuffer(&instanceBufferDesc, nullptr, &_instanceBuffer);
 
 	if (FAILED(result))
 		throw D3DError("Failed to create an instance buffer");
 }
 
-void InstancedModel::ApplyBuffers(D3D& d3D)
+void InstancedModel::ApplyBuffers(D3D& d3D, const void* instanceData, size_t instanceSize, uint instanceCount)
 {
 	if (!_model)
 		throw D3DError("No model");
 
+	auto deviceContext = d3D.GetDeviceContext();
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	auto result = deviceContext->Map(_instanceBuffer.get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	if (FAILED(result))
+		throw D3DError("Can't map a resource");
+
+	memcpy(mappedResource.pData, instanceData, instanceSize * instanceCount);
+
+	deviceContext->Unmap(_instanceBuffer.get(), 0);
+
 	// Set vertex buffer stride and offset.
-	const uint strides[]{ _model->GetVertexSize(), sizeof(Instance)};
+	const uint strides[]{ (uint)_model->GetVertexSize(), (uint)instanceSize };
 	const uint offsets[]{ 0u, 0u };
 	ID3D11Buffer* bufferPointers[2] = { _model->GetVertexBuffer(), _instanceBuffer.get() };
-
-	auto deviceContext = d3D.GetDeviceContext();
 
 	// Set the vertex buffer to active in the input assembler so it can be rendered.
 	deviceContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);

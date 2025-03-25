@@ -14,12 +14,12 @@ void Model::ApplyBuffers(D3D& d3D)
 	d3D.GetDeviceContext()->IASetIndexBuffer(_indexBuffer.get(), DXGI_FORMAT_R32_UINT, 0);
 }
 
-int Model::GetVertexSize() const
+size_t Model::GetVertexSize() const
 {
 	return sizeof(Vertex);
 }
 
-int Model::GetIndexCount() const
+uint Model::GetIndexCount() const
 {
 	return _indexCount;
 }

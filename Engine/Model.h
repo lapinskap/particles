@@ -16,8 +16,8 @@ public:
 	void Initialize(D3D& d3D);
 	void ApplyBuffers(D3D& d3D);
 
-	int GetVertexSize() const;
-	int GetIndexCount() const;
+	size_t GetVertexSize() const;
+	uint GetIndexCount() const;
 	ID3D11Buffer* GetVertexBuffer();
 
 protected:

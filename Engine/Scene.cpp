@@ -1,58 +1,43 @@
 #include "Scene.h"
 #include "D3D.h"
 #include "Common.h"
+#include "SceneGraph/SceneGraphExecutor.h"
+#include "SceneGraph/SceneNode_InstancedModel.h"
+#include "SceneGraph/SceneNode_Shader.h"
+#include "SceneGraph/SceneNode_Transform.h"
+#include "SceneGraph/SceneNode_Camera.h"
 
 void Scene::Initialize(D3D& d3D)
 {
 	// Set the initial position of the camera.
 	_camera.SetPosition(0.0f, 0.0f, -5.0f);
 
-	_model.Initialize(d3D);
+	auto instancedModel = std::make_shared<InstancedModel>(std::make_shared<SphereModel>());
 
-	std::vector<InstancedModel::Instance> instances
-	{
-		{{0.0f, 1.0f, 0.0f}},
-		{{-1.5f, -1.0f, 0.0f}},
-		{{1.5f, -1.0f, 0.0f}},
-	};
+	_rootSceneNode = std::make_unique<SceneNode>();
 
-	_instancedModel.Initialize(d3D, &_model, instances);
+	auto sceneNode_Shader = _rootSceneNode->AddChild(new SceneNode_Shader(std::make_shared<LightShader>()));
 
-	_lightShader = std::make_unique<LightShader>(d3D);
+	auto sceneNode_Camera = sceneNode_Shader->AddChild(new SceneNode_Camera(&_camera));
 
-	_light.diffuseColor = DirectX::XMFLOAT4(1.0f, 1.0f, 1.0f, 1.0f);
-	_light.direction = DirectX::XMFLOAT3(0.5f, -0.5f, 0.5f);
+	sceneNode_Camera
+		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(0.0f, 1.0f, 0.0f)))
+		->AddChild(new SceneNode_InstancedModel(instancedModel));
+
+	sceneNode_Camera
+		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(-1.5f, -1.0f, 0.0f)))
+		->AddChild(new SceneNode_InstancedModel(instancedModel));
+
+	sceneNode_Camera
+		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(1.5f, -1.0f, 0.0f)))
+		->AddChild(new SceneNode_InstancedModel(instancedModel));
+
+	_executor.Initialize(d3D, _rootSceneNode.get());
 }
 
 bool Scene::Render(D3D& d3D, float dt)
 {
-	DirectX::XMMATRIX worldMatrix, viewMatrix, projectionMatrix;
-
-	// Generate the view matrix based on the camera's position.
-	_camera.Render();
-
-	// Get the world, view, and projection matrices from the camera and d3d objects.
-	d3D.GetWorldMatrix(worldMatrix);
-	_camera.GetViewMatrix(viewMatrix);
-	d3D.GetProjectionMatrix(projectionMatrix);
-
-	static float time = 0.0f;
-	time += dt;
-
-	float rotation = 0.1f * time;
-
-	// Rotate the world matrix by the rotation value so that the triangle will spin.
-	worldMatrix = DirectX::XMMatrixRotationY(rotation);
-
-	_instancedModel.ApplyBuffers(d3D);
-
-	// Render the model using the light shader.
-	bool result = _lightShader->Render_Old(d3D, 
-										   _model.GetIndexCount(), _instancedModel.GetInstanceCount(),
-										   worldMatrix, viewMatrix, projectionMatrix, 
-										   _light);
-	if (!result)
-		return false;
+	_executor.Execute(_rootSceneNode.get());
 
 	return true;
 }

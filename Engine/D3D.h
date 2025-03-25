@@ -44,8 +44,6 @@ public:
     ID3D11DeviceContext* GetDeviceContext();
 
     void GetProjectionMatrix(DirectX::XMMATRIX&);
-    void GetWorldMatrix(DirectX::XMMATRIX&);
-    void GetOrthoMatrix(DirectX::XMMATRIX&);
 
     const std::string& GetVideoCardInfo() const;
 

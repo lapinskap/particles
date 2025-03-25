@@ -1,10 +1,6 @@
 #pragma once
-#pragma once
 
-#include <d3d11.h>
-#include <directxmath.h>
-#include "ReleasePtr.h"
-#include "Common.h"
+#include "D3D.h"
 
 class D3D;
 class Model;
@@ -13,20 +9,17 @@ class InstancedModel
 {
 public:
 
-	struct Instance
-	{
-		DirectX::XMFLOAT3 position;
-	};
+	InstancedModel(std::shared_ptr<Model> model);
 
-	void Initialize(D3D& d3D, Model* model, const std::vector<Instance>& instances);
-	void ApplyBuffers(D3D& d3D);
+	
 
-	int GetInstanceCount() const { return _instanceCount; }
+	void Initialize(D3D& d3D, size_t instanceSize, uint instanceCount);
+	void ApplyBuffers(D3D& d3D, const void* instanceData, size_t instanceSize, uint instanceCount);
+
+	Model* GetModel() const { return _model.get(); }
 
 protected:
 	
-	int _instanceCount = 0;
-
-	Model* _model = nullptr;
+	std::shared_ptr<Model> _model;
 	ReleasePtr<ID3D11Buffer> _instanceBuffer;
 };

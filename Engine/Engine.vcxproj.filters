@@ -46,13 +46,10 @@
     <ClInclude Include="SceneGraph\SceneNode.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="SceneGraph\SceneNode_Render.h">
+    <ClInclude Include="SceneGraph\SceneNode_InstancedModel.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="SceneGraph\SceneNode_SetModel.h">
-      <Filter>Source Files\SceneGraph</Filter>
-    </ClInclude>
-    <ClInclude Include="SceneGraph\SceneNode_SetShader.h">
+    <ClInclude Include="SceneGraph\SceneNode_Shader.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
     <ClInclude Include="SceneGraph\SceneNode_Transform.h">
@@ -66,6 +63,18 @@
     </ClInclude>
     <ClInclude Include="Scene.h" />
     <ClInclude Include="InstancedModel.h" />
+    <ClInclude Include="SceneGraph\SceneTraversalState.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneData.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneGraphExecutor.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneGraph\SceneNode_Camera.h">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -101,16 +110,10 @@
     <ClCompile Include="Model.h">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SceneGraph\SceneNode.cpp">
+    <ClCompile Include="SceneGraph\SceneNode_InstancedModel.cpp">
       <Filter>Source Files\SceneGraph</Filter>
     </ClCompile>
-    <ClCompile Include="SceneGraph\SceneNode_Render.cpp">
-      <Filter>Source Files\SceneGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneGraph\SceneNode_SetModel.cpp">
-      <Filter>Source Files\SceneGraph</Filter>
-    </ClCompile>
-    <ClCompile Include="SceneGraph\SceneNode_SetShader.cpp">
+    <ClCompile Include="SceneGraph\SceneNode_Shader.cpp">
       <Filter>Source Files\SceneGraph</Filter>
     </ClCompile>
     <ClCompile Include="SceneGraph\SceneNode_Transform.cpp">
@@ -127,6 +130,15 @@
     </ClCompile>
     <ClCompile Include="InstancedModel.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneGraphExecutor.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneGraph\SceneNode_Camera.cpp">
+      <Filter>Source Files\SceneGraph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

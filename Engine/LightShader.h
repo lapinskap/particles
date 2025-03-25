@@ -1,6 +1,5 @@
 #pragma once
 
-#include <d3dcompiler.h>
 #include "D3D.h"
 #include "ReleasePtr.h"
 #include "Shader.h"
@@ -11,20 +10,18 @@ struct Light;
 class LightShader : public Shader
 {
 public:
-	LightShader(D3D& d3D);
 
-	bool Render_Old(D3D& d3D, int indexCount, int instanceCount,
-		DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix,
-		Light& light);
+	LightShader();
 
-private:
+	virtual void Initialize(D3D& d3D) override;
+	virtual std::unique_ptr<SceneData> CreateSceneData() const override;
+	virtual void Render(D3D& d3D, const SceneData& sceneData) override;
+	virtual size_t GetInstanceSize() const override;
 
-	bool InitializeShader(D3D& d3D);
+protected:
 
-	bool SetShaderParameters(D3D& d3D, DirectX::XMMATRIX worldMatrix, DirectX::XMMATRIX viewMatrix, DirectX::XMMATRIX projectionMatrix, Light& light);
-	void RenderShader(D3D& d3D, int indexCount, int instanceCount, DirectX::XMMATRIX worldMatrix);
+	virtual std::vector<D3D11_INPUT_ELEMENT_DESC> GetVertexLayout() const override;
 
-	ReleasePtr<ID3D11InputLayout> _layout;
 	ReleasePtr<ID3D11Buffer> _lightBuffer;
 	ReleasePtr<ID3D11Buffer> _timeBuffer;
 };
