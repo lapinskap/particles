@@ -20,15 +20,15 @@ void Scene::Initialize(D3D& d3D)
 	auto sceneNode_Shader = _rootSceneNode->AddChild(new SceneNode_Shader(std::make_shared<LightShader>()));
 
 	sceneNode_Shader
-		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(0.0f, 1.0f, 0.0f)))
+		->AddChild(new SceneNode_Transform(DX::XMMatrixScaling(0.5f, 0.5f, 0.5f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
 
-	sceneNode_Shader
-		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(-1.5f, -1.0f, 0.0f)))
-		->AddChild(new SceneNode_InstancedModel(instancedModel));
+	_rotationalCenter = new SceneNode_Transform;
+	sceneNode_Shader->AddChild(_rotationalCenter);
 
-	sceneNode_Shader
-		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(1.5f, -1.0f, 0.0f)))
+	_rotationalCenter
+		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(1.75f, 0.0f, 0.0f)))
+		->AddChild(new SceneNode_Transform(DX::XMMatrixScaling(0.15f, 0.15f, 0.15f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
 
 	sceneNode_Shader->AddChild(new SceneNode_Camera(&_camera));
@@ -38,6 +38,10 @@ void Scene::Initialize(D3D& d3D)
 
 bool Scene::Render(D3D& d3D, float dt)
 {
+	static float rotation = 0.0f;
+	rotation += dt;
+	_rotationalCenter->transform = DX::XMMatrixRotationZ(rotation);
+
 	_executor.Execute(_rootSceneNode.get());
 
 	return true;

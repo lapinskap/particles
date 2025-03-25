@@ -7,14 +7,17 @@ class SceneNode_Transform : public SceneNode
 {
 public:
 
-	SceneNode_Transform(const DX::XMMATRIX& transform)
-		: _transform(transform)
+	SceneNode_Transform()
+		: transform(DX::XMMatrixIdentity())
+	{
+	}
+
+	SceneNode_Transform(const DX::XMMATRIX& transform_)
+		: transform(transform_)
 	{
 	}
 
 	virtual void PreExecute(SceneTraversalState& state, std::unique_ptr<SceneData>& sceneData) override;
 
-protected:
-
-	DX::XMMATRIX _transform;
+	DX::XMMATRIX transform;
 };

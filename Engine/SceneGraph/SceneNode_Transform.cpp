@@ -4,5 +4,5 @@
 
 void SceneNode_Transform::PreExecute(SceneTraversalState& state, std::unique_ptr<SceneData>&)
 {
-	state.transform *= _transform;
+	state.transform = transform * state.transform;
 }

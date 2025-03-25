@@ -13,6 +13,7 @@
 
 class D3D;
 class SceneGraphExecutor;
+class SceneNode_Transform;
 
 class Scene
 {
@@ -30,4 +31,5 @@ private:
 	Camera _camera;
 	std::unique_ptr<SceneNode> _rootSceneNode;
 	SceneGraphExecutor _executor;
+	SceneNode_Transform* _rotationalCenter;
 };
