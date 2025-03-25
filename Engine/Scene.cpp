@@ -6,6 +6,7 @@
 #include "SceneGraph/SceneNode_Shader.h"
 #include "SceneGraph/SceneNode_Transform.h"
 #include "SceneGraph/SceneNode_Camera.h"
+#include <iostream>
 
 void Scene::Initialize(D3D& d3D)
 {
@@ -18,19 +19,19 @@ void Scene::Initialize(D3D& d3D)
 
 	auto sceneNode_Shader = _rootSceneNode->AddChild(new SceneNode_Shader(std::make_shared<LightShader>()));
 
-	auto sceneNode_Camera = sceneNode_Shader->AddChild(new SceneNode_Camera(&_camera));
-
-	sceneNode_Camera
+	sceneNode_Shader
 		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(0.0f, 1.0f, 0.0f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
 
-	sceneNode_Camera
+	sceneNode_Shader
 		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(-1.5f, -1.0f, 0.0f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
 
-	sceneNode_Camera
+	sceneNode_Shader
 		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(1.5f, -1.0f, 0.0f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
+
+	sceneNode_Shader->AddChild(new SceneNode_Camera(&_camera));
 
 	_executor.Initialize(d3D, _rootSceneNode.get());
 }

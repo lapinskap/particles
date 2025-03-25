@@ -9,6 +9,7 @@
 #include <fstream>
 #include <format>
 #include <chrono>
+#include <ratio>
 #include <stdint.h>
 #include <directxmath.h>
 

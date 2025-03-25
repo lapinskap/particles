@@ -15,10 +15,10 @@ void Application::Frame()
 	// Clear the buffers to begin the scene.
 	_direct3D.BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
-	auto deltaTimeMs = std::chrono::duration_cast<std::chrono::milliseconds>(beginFrameTimepoint - _lastUpdateTimepoint).count();
+	std::chrono::duration<float> deltaTimeSeconds = beginFrameTimepoint - _lastUpdateTimepoint;
 	_lastUpdateTimepoint = beginFrameTimepoint;
 
-	_scene.Render(_direct3D, deltaTimeMs);
+	_scene.Render(_direct3D, deltaTimeSeconds.count());
 
 	// Present the rendered scene to the screen.
 	_direct3D.EndScene();
