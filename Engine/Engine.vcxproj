@@ -82,7 +82,6 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="D3D.h" />
-    <ClInclude Include="GraphicsState.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="InstancedModel.h" />
     <ClInclude Include="Light.h" />

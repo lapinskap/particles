@@ -55,13 +55,9 @@
     <ClInclude Include="SceneGraph\SceneNode_Transform.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicsState.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneGraph\SceneTraversalState.h">
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
@@ -75,6 +71,9 @@
       <Filter>Source Files\SceneGraph</Filter>
     </ClInclude>
     <ClInclude Include="InstancedModel.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

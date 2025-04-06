@@ -28,10 +28,6 @@ float4 LightPixelShader(PixelInput input) : SV_TARGET
     float lightIntensity = saturate(dot(normal, lightDir));
 
     float4 color = input.color;
-    float azimuth = color.a;
-    color.a = 1.0f;
-    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
-    color = color * max(abs(sin(8 * azimuth)), 0.35); // arbuz
     
     color = color * saturate(diffuseColor * lightIntensity);
     color = color + pow(saturate(dot(reflectDir, lightDir)), 4);

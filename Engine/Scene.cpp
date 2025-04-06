@@ -31,6 +31,11 @@ void Scene::Initialize(D3D& d3D)
 		->AddChild(new SceneNode_Transform(DX::XMMatrixScaling(0.15f, 0.15f, 0.15f)))
 		->AddChild(new SceneNode_InstancedModel(instancedModel));
 
+	_rotationalCenter
+		->AddChild(new SceneNode_Transform(DX::XMMatrixTranslation(-1.75f, 0.0f, 0.0f)))
+		->AddChild(new SceneNode_Transform(DX::XMMatrixScaling(0.15f, 0.15f, 0.15f)))
+		->AddChild(new SceneNode_InstancedModel(instancedModel));
+
 	sceneNode_Shader->AddChild(new SceneNode_Camera(&_camera));
 
 	_executor.Initialize(d3D, _rootSceneNode.get());
